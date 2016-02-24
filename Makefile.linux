@@ -1,0 +1,3 @@
+default:
+        gcc -shared -o libhackmalloc.so -fPIC -std=c99 -O2 hack_malloc.c
+        gcc test.c -std=c99 -L. -Wl,-rpath,. -lhackmalloc -O2 -o test
