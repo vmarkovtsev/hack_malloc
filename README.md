@@ -19,9 +19,9 @@ make -f cp Makefile.darwin
 ### How to inject
 Linux:
 ```
-LD_PRELOAD=/path/to/libhackmalloc.so ./program
+LD_PRELOAD=/path/to/liboverridemalloc.so ./program
 ```
 Mac OS X:
 ```
-DYLD_INSERT_LIBRARIES=/path/to/libhackmalloc.so ./program
+DYLD_INSERT_LIBRARIES=/path/to/liboverridemalloc.so ./program
 ```
