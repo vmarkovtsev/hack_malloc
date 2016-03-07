@@ -1,4 +1,5 @@
 default:
 	clang -dynamiclib -undefined suppress -flat_namespace -std=c99 -fPIC -O2 hack_malloc.c -o libhackmalloc.dylib
 	clang -dynamiclib -undefined suppress -flat_namespace -std=c99 -fPIC -O2 override_malloc.c -o liboverridemalloc.dylib
+	clang -dynamiclib -undefined suppress -flat_namespace -std=c99 -fPIC -O2 trace_malloc.c -o libtracemalloc.dylib
 	clang test.c -std=c99 -L. -lhackmalloc -O2 -o test
