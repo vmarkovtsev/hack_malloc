@@ -6,7 +6,7 @@
 #include <sys/mman.h>
 
 void* malloc(size_t size) {
-  printf("malloc... ");
+  write(STDOUT_FILENO, "malloc... ", 10);
   size += sizeof(size_t);
   int page_size = getpagesize();
   int rem = size % page_size;
@@ -15,20 +15,20 @@ void* malloc(size_t size) {
   }
   void* addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
   if (addr == MAP_FAILED) {
-    printf("fail\n");
+    write(STDOUT_FILENO, "fail\n", 5);
     return NULL;
   }
-  printf("ok\n");
+  write(STDOUT_FILENO, "ok\n", 3);
   *(size_t*)addr = size;
   return (size_t*)addr + 1;
 }
 
 void free (void *ptr) {
-  printf("free... ");
+  write(STDOUT_FILENO, "free... ", 8);
   size_t* real_ptr = (size_t*)ptr - 1;
   if (!munmap(real_ptr, *real_ptr)) {
-    printf("ok\n");
+    write(STDOUT_FILENO, "ok\n", 3);
   } else {
-    printf("fail\n");
+    write(STDOUT_FILENO, "fail\n", 5);
   }
 }
