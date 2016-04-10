@@ -12,7 +12,6 @@
 
 int fd = 0;
 void* (*__malloc)(size_t) = NULL;
-void (*__free)(void*) = NULL;
 long start_sec = 0, start_mcsec = 0;
 
 inline void get_time(long* sec, long* mcsec) {
