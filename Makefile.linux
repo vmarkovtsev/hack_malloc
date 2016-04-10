@@ -1,5 +1,5 @@
 default:
-	gcc -shared -o libhackmalloc.so -fPIC -std=c99 -O2 hack_malloc.c
-	gcc -shared -o liboverridemalloc.so -fPIC -std=c99 -O2 override_malloc.c
-	gcc -shared -o libtracemalloc.so -fPIC -std=c99 -O2 trace_malloc.c
+	gcc -shared -o libhackmalloc.so -fPIC -std=c99 -O2 -Wno-unused-result hack_malloc.c
+	gcc -shared -o liboverridemalloc.so -fPIC -std=c99 -O2 -Wno-unused-result override_malloc.c
+	gcc -shared -o libtracemalloc.so -fPIC -std=c99 -O2 -Wno-unused-result trace_malloc.c
 	gcc test.c -std=c99 -L. -Wl,-rpath,. -lhackmalloc -O2 -o test
