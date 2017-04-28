@@ -1,6 +1,7 @@
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -51,6 +52,6 @@ void* malloc(size_t size) {
     sec -= 1;
     mcsec += 1000000;
   }
-  write(fd, record, sprintf(record, "%ld.%06ld\t%zu\n", sec, mcsec, size));
+  write(fd, record, sprintf(record, "%ld.%06ld\t%ld\t%zu\n", sec, mcsec, pthread_self(), size));
   return __malloc(size);
 }
