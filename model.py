@@ -37,10 +37,21 @@ def main():
     log = logging.getLogger("main")
     log.info("parsing %s...", args.input)
     threads = defaultdict(list)
+    ptrs = {}
     with gzip.open(args.input) as fin:
         for line in fin:
             parts = line[:-1].split(b"\t")
-            threads[int(parts[1])].append(int(parts[2]).bit_length())
+            thread = int(parts[1])
+            size = int(parts[2])
+            ptr = parts[3]
+            if size > -1:
+                threads[thread].append(size.bit_length())
+                ptrs[ptr] = size
+            else:
+                size = ptrs.get(ptr, 0)
+                if size > 0:
+                    del ptrs[ptr]
+                threads[thread].append(32 + size.bit_length())
     log.info("generating the training samples...")
     maxlen = args.maxlen
     train_size = sum(max(0, len(v) - maxlen) for v in threads.values())
@@ -48,9 +59,9 @@ def main():
     try:
         x = numpy.zeros((train_size, maxlen), dtype=numpy.int8)
     except MemoryError as e:
-        log.error("failed to allocate %d bytes", train_size * maxlen * 32 * 4)
+        log.error("failed to allocate %d bytes", train_size * maxlen * 4)
         raise e from None
-    y = numpy.zeros((train_size, 32), dtype=numpy.float32)
+    y = numpy.zeros((train_size, 64), dtype=numpy.float32)
     offset = 0
     for _, allocs in sorted(threads.items()):
         for i in range(maxlen, len(allocs)):
@@ -76,10 +87,10 @@ def train(x, y, **kwargs):
     layer_type = kwargs.get("type", "LSTM")
     validation = kwargs.get("validation", 0)
     model = models.Sequential()
-    embedding = numpy.zeros((32, 32), dtype=numpy.float32)
+    embedding = numpy.zeros((64, 64), dtype=numpy.float32)
     numpy.fill_diagonal(embedding, 1)
     model.add(layers.embeddings.Embedding(
-        32, 32, input_length=x[0].shape[-1], weights=[embedding],
+        64, 64, input_length=x[0].shape[-1], weights=[embedding],
         trainable=False))
     model.add(getattr(layers, layer_type)(
         neurons, dropout=dropout, recurrent_dropout=recurrent_dropout,
