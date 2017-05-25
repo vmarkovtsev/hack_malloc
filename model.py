@@ -5,6 +5,7 @@ import logging
 import sys
 
 from keras import models, layers, regularizers, optimizers
+from keras.utils import plot_model
 import numpy
 
 
@@ -27,6 +28,7 @@ def setup():
     parser.add_argument("--optimizer", default="rmsprop")
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--visualize")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     return args
@@ -59,9 +61,9 @@ def main():
     try:
         x = numpy.zeros((train_size, maxlen), dtype=numpy.int8)
     except MemoryError as e:
-        log.error("failed to allocate %d bytes", train_size * maxlen * 4)
+        log.error("failed to allocate %d bytes", train_size * maxlen)
         raise e from None
-    y = numpy.zeros((train_size, 64), dtype=numpy.float32)
+    y = numpy.zeros((train_size, 64), dtype=numpy.int8)
     offset = 0
     for _, allocs in sorted(threads.items()):
         for i in range(maxlen, len(allocs)):
@@ -107,6 +109,8 @@ def train(x, y, **kwargs):
     optimizer = getattr(optimizers, optimizer)(lr=learning_rate, clipnorm=1.)
     model.compile(loss="categorical_crossentropy", optimizer=optimizer,
                   metrics=["accuracy", "top_k_categorical_accuracy"])
+    if kwargs.get("visualize"):
+        plot_model(model, to_file=kwargs["visualize"], show_shapes=True)
     model.fit(x, y, batch_size=batch_size, epochs=epochs,
               validation_split=validation)
     return model
